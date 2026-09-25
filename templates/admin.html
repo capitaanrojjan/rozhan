@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>پنل مدیریت | ما سه نفر</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            👨‍💼 پنل مدیریت
+        </div>
+
+        <nav class="navbar">
+
+            <a href="/" class="nav-item">
+                🏠
+                <span>صفحه اصلی</span>
+            </a>
+
+            <a href="/logout" class="nav-item">
+                🚪
+                <span>خروج</span>
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+        <!-- ================= ADD PRODUCT ================= -->
+
+        <section class="section">
+
+            <div class="form-box">
+
+                <div class="section-icon">
+                    ➕
+                </div>
+
+                <h2>
+                    افزودن محصول جدید
+                </h2>
+
+                <form
+                    action="/admin/add-product"
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="نام محصول"
+                        required
+                    >
+
+                    <input
+                        type="number"
+                        name="price"
+                        placeholder="قیمت محصول"
+                        min="0"
+                        required
+                    >
+
+                    <textarea
+                        name="description"
+                        placeholder="توضیحات محصول"
+                        rows="4"
+                    ></textarea>
+
+                    <label for="image">
+                        🖼️ انتخاب تصویر محصول
+                    </label>
+
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        accept="image/*"
+                        required
+                    >
+
+                    <button type="submit">
+                        ➕ افزودن محصول
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PRODUCTS ================= -->
+
+        <section class="section products-section">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    🛍️
+                </div>
+
+                <h2>
+                    محصولات ثبت‌شده
+                </h2>
+
+                <p>
+                    مدیریت محصولات فروشگاه
+                </p>
+
+            </div>
+
+
+            <div class="products">
+
+                {% if products %}
+
+                    {% for product in products %}
+
+                    <div class="product-card">
+
+                        {% if product[4] %}
+
+                            <img
+                                src="/uploads/{{ product[4] }}"
+                                alt="{{ product[1] }}"
+                                class="product-image"
+                            >
+
+                        {% else %}
+
+                            <div class="product-image">
+                                🎁
+                            </div>
+
+                        {% endif %}
+
+
+                        <h3>
+                            {{ product[1] }}
+                        </h3>
+
+
+                        {% if product[3] %}
+
+                            <p>
+                                {{ product[3] }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                توضیحی برای این محصول ثبت نشده است.
+                            </p>
+
+                        {% endif %}
+
+
+                        <div class="product-bottom">
+
+                            <span class="price">
+                                {{ "{:,}".format(product[2]|int) }} تومان
+                            </span>
+
+                        </div>
+
+
+                        <form
+                            action="/admin/delete-product/{{ product[0] }}"
+                            method="POST"
+                            onsubmit="return confirm('⚠️ آیا مطمئن هستید که می‌خواهید این محصول را حذف کنید؟');"
+                        >
+
+                            <button
+                                type="submit"
+                            >
+                                🗑️ حذف محصول
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="product-card">
+
+                        <div class="product-image">
+                            📦
+                        </div>
+
+                        <h3>
+                            محصولی وجود ندارد
+                        </h3>
+
+                        <p>
+                            هنوز هیچ محصولی در فروشگاه ثبت نشده است.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            🛍️ ما سه نفر | پنل مدیریت
+        </p>
+
+        <p>
+            © ۱۴۰۵ تمامی حقوق محفوظ است.
+        </p>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="/static/js/script.js"></script>
+
+</body>
+
+</html>
+```

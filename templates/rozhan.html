@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ما سه نفر 🛍️</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            🛍️ ما سه نفر
+        </div>
+
+        <nav class="navbar">
+
+            <a href="#home" class="nav-item">
+                🏠
+                <span>خانه</span>
+            </a>
+
+            {% if not user_name %}
+
+                <a href="#login" class="nav-item">
+                    🔐
+                    <span>ورود</span>
+                </a>
+
+                <a href="#register" class="nav-item">
+                    📝
+                    <span>ثبت نام</span>
+                </a>
+
+            {% endif %}
+
+            <a href="#products" class="nav-item">
+                🛍️
+                <span>محصولات</span>
+            </a>
+
+            <a href="#wallet" class="nav-item">
+                💰
+                <span>کیف پول</span>
+            </a>
+
+            <a href="#cart" class="nav-item">
+                🛒
+                <span>سبد خرید</span>
+
+                {% if cart_count > 0 %}
+                    <span class="cart-count">
+                        {{ cart_count }}
+                    </span>
+                {% endif %}
+
+            </a>
+
+            <a href="#about" class="nav-item">
+                👥
+                <span>معرفی ما</span>
+            </a>
+
+            {% if user_name %}
+
+                {% if is_admin %}
+
+                    <a href="/admin" class="nav-item">
+                        🛠️
+                        <span>پنل مدیریت</span>
+                    </a>
+
+                {% endif %}
+
+                <a href="/logout" class="nav-item">
+                    🚪
+                    <span>خروج</span>
+                </a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+        <!-- ================= HOME ================= -->
+
+        <section id="home" class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-icon">
+                    🛍️
+                </div>
+
+                <h1>
+                    به سایت «ما سه نفر» خوش آمدید! 🌟
+                </h1>
+
+                <p>
+                    یک فروشگاه برای سه نفر و برای همه شما ❤️
+                </p>
+
+                <p>
+                    خریدی راحت، سریع و دوست‌داشتنی 😊
+                </p>
+
+                {% if user_name %}
+
+                    <p>
+                        خوش آمدی {{ user_name }}! 😊
+                    </p>
+
+                {% endif %}
+
+                <a href="#products" class="main-button">
+                    مشاهده محصولات 🛒
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= LOGIN ================= -->
+
+        {% if not user_name %}
+
+        <section id="login" class="section">
+
+            <div class="form-box">
+
+                <div class="section-icon">
+                    🔐
+                </div>
+
+                <h2>
+                    ورود به حساب کاربری
+                </h2>
+
+                <p>
+                    خوش آمدید! 😊
+                </p>
+
+                <form action="/login" method="POST">
+
+                    <input
+                        type="text"
+                        name="phone"
+                        placeholder="📱 شماره تلفن"
+                        autocomplete="tel"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="🔑 رمز عبور"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button type="submit">
+                        ورود 🚀
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= REGISTER ================= -->
+
+        <section id="register" class="section">
+
+            <div class="form-box">
+
+                <div class="section-icon">
+                    📝
+                </div>
+
+                <h2>
+                    ساخت حساب کاربری
+                </h2>
+
+                <p>
+                    رمز مورد علاقه خودت را انتخاب کن 😊
+                </p>
+
+                <form action="/register" method="POST">
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="👤 نام و نام خانوادگی"
+                        autocomplete="name"
+                        required
+                    >
+
+                    <input
+                        type="tel"
+                        name="phone"
+                        placeholder="📱 شماره تلفن"
+                        autocomplete="tel"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="🔑 رمز عبور"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        name="password_confirm"
+                        placeholder="🔐 تکرار رمز عبور"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <button type="submit">
+                        ثبت نام ✨
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- ================= PRODUCTS ================= -->
+
+        <section id="products" class="section products-section">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    🛍️
+                </div>
+
+                <h2>
+                    محصولات ما
+                </h2>
+
+                <p>
+                    محصولات مورد علاقه‌ات را پیدا کن ✨
+                </p>
+
+            </div>
+
+
+            <div class="products">
+
+                {% if products %}
+
+                    {% for product in products %}
+
+                    <div class="product-card">
+
+                        {% if product[4] %}
+
+                            <img
+                                src="/uploads/{{ product[4] }}"
+                                alt="{{ product[1] }}"
+                                class="product-image"
+                            >
+
+                        {% else %}
+
+                            <div class="product-image">
+                                🎁
+                            </div>
+
+                        {% endif %}
+
+
+                        <h3>
+                            {{ product[1] }}
+                        </h3>
+
+
+                        {% if product[3] %}
+
+                            <p>
+                                {{ product[3] }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                یک محصول باکیفیت برای شما 🌟
+                            </p>
+
+                        {% endif %}
+
+
+                        <div class="product-bottom">
+
+                            <span class="price">
+                                {{ "{:,}".format(product[2]|int) }} تومان
+                            </span>
+
+                            <form
+                                action="/cart/add/{{ product[0] }}"
+                                method="POST"
+                            >
+
+                                <button type="submit">
+                                    🛒 افزودن
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="product-card">
+
+                        <div class="product-image">
+                            📦
+                        </div>
+
+                        <h3>
+                            هنوز محصولی ثبت نشده است
+                        </h3>
+
+                        <p>
+                            محصولات جدید به‌زودی اضافه می‌شوند. 😊
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= WALLET ================= -->
+
+        <section id="wallet" class="section wallet-section">
+
+            <div class="wallet-box">
+
+                <div class="section-icon">
+                    💰
+                </div>
+
+                <h2>
+                    کیف پول من
+                </h2>
+
+
+                {% if user_name %}
+
+                    <p>
+                        موجودی فعلی شما
+                    </p>
+
+
+                    <div class="wallet-balance">
+                        {{ "{:,}".format(wallet_balance|int) }} تومان 💳
+                    </div>
+
+
+                    <form
+                        class="wallet-form"
+                        action="/wallet/add"
+                        method="POST"
+                    >
+
+                        <label for="walletAmount">
+                            💵 مبلغ مورد نظر
+                        </label>
+
+
+                        <input
+                            id="walletAmount"
+                            name="amount"
+                            type="number"
+                            min="1"
+                            max="100000000"
+                            step="1"
+                            placeholder="مثلاً 500000"
+                            required
+                        >
+
+
+                        <button type="submit">
+                            ➕ افزایش موجودی
+                        </button>
+
+                    </form>
+
+
+                    <p class="wallet-note">
+                        ✨ مبلغ مورد نظر را از ۱ تا ۱۰۰ میلیون تومان وارد کنید.
+                    </p>
+
+                {% else %}
+
+                    <div class="empty-cart">
+
+                        <div class="empty-cart-icon">
+                            🔐
+                        </div>
+
+                        <h3>
+                            ابتدا وارد حساب کاربری شوید
+                        </h3>
+
+                        <p>
+                            برای استفاده از کیف پول باید وارد حساب خود شوید.
+                        </p>
+
+                        <a
+                            href="#login"
+                            class="main-button"
+                        >
+                            ورود به حساب 🔐
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= CART ================= -->
+
+        <section id="cart" class="section">
+
+            <div class="cart-box">
+
+                <div class="section-icon">
+                    🛒
+                </div>
+
+                <h2>
+                    سبد خرید
+                </h2>
+
+
+                {% if cart_items %}
+
+                    <p>
+                        محصولات انتخاب‌شده شما ❤️
+                    </p>
+
+
+                    <div class="cart-items">
+
+                        {% for item in cart_items %}
+
+                        <div class="cart-item">
+
+                            <div class="cart-item-image">
+
+                                {% if item.image %}
+
+                                    <img
+                                        src="/uploads/{{ item.image }}"
+                                        alt="{{ item.name }}"
+                                    >
+
+                                {% else %}
+
+                                    🎁
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="cart-item-info">
+
+                                <h3>
+                                    {{ item.name }}
+                                </h3>
+
+                                <p>
+                                    قیمت هر عدد:
+                                    {{ "{:,}".format(item.price|int) }}
+                                    تومان
+                                </p>
+
+                                <p>
+                                    جمع این محصول:
+                                    <strong>
+                                        {{ "{:,}".format(item.total|int) }}
+                                        تومان
+                                    </strong>
+                                </p>
+
+                            </div>
+
+
+                            <div class="cart-item-actions">
+
+                                <div class="quantity-controls">
+
+                                    <form
+                                        action="/cart/decrease/{{ item.id }}"
+                                        method="POST"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            title="کم کردن"
+                                        >
+                                            −
+                                        </button>
+
+                                    </form>
+
+
+                                    <span class="quantity">
+                                        {{ item.quantity }}
+                                    </span>
+
+
+                                    <form
+                                        action="/cart/increase/{{ item.id }}"
+                                        method="POST"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            title="زیاد کردن"
+                                        >
+                                            +
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+
+                                <form
+                                    action="/cart/remove/{{ item.id }}"
+                                    method="POST"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="remove-cart-button"
+                                    >
+                                        🗑️ حذف
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <div class="cart-total">
+
+                        <span>
+                            💰 جمع کل سبد خرید:
+                        </span>
+
+                        <strong>
+                            {{ "{:,}".format(cart_total|int) }}
+                            تومان
+                        </strong>
+
+                    </div>
+
+
+                    <!-- ================= WALLET PAYMENT ================= -->
+
+                    <div class="cart-payment-placeholder">
+
+                        {% if user_name %}
+
+                            <p>
+                                💳 پرداخت از موجودی کیف پول
+                            </p>
+
+                            <form
+                                action="/wallet/pay"
+                                method="POST"
+                            >
+
+                                <button type="submit">
+                                    💳 پرداخت با کیف پول
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <p>
+                                برای پرداخت ابتدا وارد حساب کاربری شوید.
+                            </p>
+
+                            <a
+                                href="#login"
+                                class="main-button"
+                            >
+                                ورود به حساب 🔐
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-cart">
+
+                        <div class="empty-cart-icon">
+                            🛒
+                        </div>
+
+                        <h3>
+                            سبد خرید شما خالی است
+                        </h3>
+
+                        <p>
+                            هنوز محصولی به سبد خرید اضافه نکرده‌اید 😊
+                        </p>
+
+                        <a
+                            href="#products"
+                            class="main-button"
+                        >
+                            مشاهده محصولات 🛍️
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ABOUT ================= -->
+
+        <section id="about" class="section about-section">
+
+            <div class="about-box">
+
+                <div class="section-icon">
+                    👥
+                </div>
+
+                <h2>
+                    معرفی ما
+                </h2>
+
+                <p>
+                    ما سه نفر یک فروشگاه اینترنتی هستیم که تلاش می‌کنیم
+                    محصولات باکیفیت را با تجربه‌ای ساده و دوست‌داشتنی
+                    در اختیار شما قرار دهیم.
+                </p>
+
+                <p>
+                    رضایت شما برای ما مهم‌ترین چیز است ❤️
+                </p>
+
+                <div class="about-icons">
+                    🚀 🛍️ 💰 ❤️ ✨ 😊
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            🛍️ ما سه نفر | ساخته شده با ❤️
+        </p>
+
+        <p>
+            © ۱۴۰۵ تمامی حقوق محفوظ است.
+        </p>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="/static/js/script.js"></script>
+
+</body>
+
+</html>
