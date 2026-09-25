@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-app.secret_key = "rozhan-secret-key"
+app.secret_key = os.environ.get("SECRET_KEY", "rozhan-secret-key")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, "rozhan.db")
@@ -17,6 +17,42 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+# ================= DATABASE INITIALIZATION =================
+
+def init_database():
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0,
+            wallet_balance INTEGER DEFAULT 0
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            description TEXT,
+            image TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+# ساخت خودکار دیتابیس هنگام اجرای برنامه
+init_database()
 
 
 # ================= FILE CHECK =================
@@ -287,7 +323,6 @@ def add_wallet_balance():
     if amount <= 0:
         return "مبلغ باید بیشتر از صفر باشد ❌"
 
-    # حداکثر مبلغ قابل افزایش در هر بار: ۱۰۰ میلیون تومان
     if amount > 100_000_000:
         return "حداکثر مبلغ قابل افزایش در هر بار ۱۰۰ میلیون تومان است ❌"
 
@@ -313,7 +348,6 @@ def add_wallet_balance():
 
     current_balance = result[0] or 0
 
-    # جلوگیری از عبور مقدار از حداکثر INTEGER در SQLite
     max_sqlite_integer = 9_223_372_036_854_775_807
 
     if current_balance + amount > max_sqlite_integer:
@@ -344,14 +378,11 @@ def add_wallet_balance():
 @app.route("/wallet/pay", methods=["POST"])
 def pay_with_wallet():
 
-    # بررسی ورود کاربر
     if not session.get("user_id"):
         return "ابتدا باید وارد حساب کاربری شوید ❌"
 
-    # دریافت اطلاعات سبد خرید
     cart_items, cart_total = get_cart_data()
 
-    # بررسی خالی نبودن سبد خرید
     if not cart_items or cart_total <= 0:
         return "سبد خرید شما خالی است ❌"
 
@@ -362,10 +393,8 @@ def pay_with_wallet():
 
     try:
 
-        # شروع تراکنش
         conn.execute("BEGIN IMMEDIATE")
 
-        # دریافت موجودی فعلی کاربر
         cursor.execute(
             """
             SELECT wallet_balance
@@ -384,7 +413,6 @@ def pay_with_wallet():
 
         current_balance = result[0] or 0
 
-        # بررسی کافی بودن موجودی
         if current_balance < cart_total:
             conn.rollback()
             conn.close()
@@ -399,10 +427,8 @@ def pay_with_wallet():
                 '<a href="/#wallet">رفتن به کیف پول 💰</a>'
             )
 
-        # محاسبه موجودی جدید
         new_balance = current_balance - cart_total
 
-        # کم کردن مبلغ از کیف پول
         cursor.execute(
             """
             UPDATE users
@@ -412,19 +438,14 @@ def pay_with_wallet():
             (new_balance, user_id)
         )
 
-        # نهایی کردن تراکنش
         conn.commit()
 
-        # به‌روزرسانی موجودی داخل session
         session["wallet_balance"] = new_balance
 
-        # خالی کردن سبد خرید بعد از پرداخت موفق
         session["cart"] = {}
         session.modified = True
 
         conn.close()
-
-        # ================= SUCCESS PAYMENT PAGE =================
 
         return f"""
 <!DOCTYPE html>
@@ -470,7 +491,6 @@ def pay_with_wallet():
                     سفارش شما با موفقیت پرداخت شد ❤️
                 </p>
 
-
                 <div class="wallet-balance">
                     {cart_total:,} تومان
                 </div>
@@ -478,7 +498,6 @@ def pay_with_wallet():
                 <p>
                     مبلغ پرداخت شده
                 </p>
-
 
                 <div class="wallet-balance">
                     {new_balance:,} تومان
@@ -488,9 +507,7 @@ def pay_with_wallet():
                     موجودی جدید کیف پول
                 </p>
 
-
                 <br>
-
 
                 <a
                     href="/#products"
